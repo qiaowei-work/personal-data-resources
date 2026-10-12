@@ -5,7 +5,7 @@ created: 2026-10-12
 
 # LANet 水下图像增强论文项目
 
-> 目标：在 **LANet**（水下图像增强，IEEE RA-L 2022）基础上提出两个互补创新点（FEM + ColorLoss），形成「频域 + 颜色」双域方法，投 **Q4（中科院四区）SCI 期刊**。这是第一篇文章，为学术生涯做铺垫。
+> 目标：在 **LANet**（水下图像增强，IEEE RA-L 2022）基础上提出三个递进创新点（FEM → ColorLoss → 双分支解耦流程），形成「频域 + 颜色 + 流程解耦」的方法，投 **Q4（中科院四区）SCI 期刊**。这是第一篇文章，为学术生涯做铺垫。
 
 ---
 
@@ -17,7 +17,7 @@ created: 2026-10-12
 
 ---
 
-## 二、两个创新点
+## 二、三个创新点
 
 ### 创新点 1：FEM（频域增强模块）
 
@@ -59,9 +59,29 @@ L_color = mean( |r_pred−r_gt| + |g_pred−g_gt| + |b_pred−b_gt| )
 总损失：L = L1 + 0.5·L_VGG + 0.1·L_color
 ```
 
-### 两个创新点的故事（论文卖点）
+### 创新点 3：双分支解耦流程（DualBranch）
 
-> 水下退化有两大物理现象：**散射**（致细节模糊）→ FEM 在频域处理；**吸收**（致蓝绿偏色）→ ColorLoss 在颜色域处理。两者互补、不重叠，形成"双域"完整方法。一个管架构、一个管监督信号，不是"叠两个模块"。
+| 项 | 内容 |
+|---|---|
+| 类型 | **流程级**改动（改整体架构） |
+| 分支 | `20261013-DualBranch` |
+| 核心 | 把原 LANet 的**单流**改成**双流解耦**：散射去除分支 + 颜色校正分支 + 自适应融合 |
+| 动机 | 散射和吸收是两种不同物理过程，原 LANet 混在一条流里处理会互相干扰 |
+
+**公式：**
+```
+共享浅层：x4 = MFM([x1; x2; x3])
+散射分支：f_scatter = GAP(x4) ⊗ GS_s(x4) ⊕ x33     （含 FEM）
+颜色分支：f_color   = GAP(x4) ⊗ GS_c(x4) ⊕ x11     （无 FEM）
+自适应融合：α = σ(Conv([f_scatter ; f_color]))
+           f_fused = α ⊙ f_scatter + (1−α) ⊙ f_color
+```
+
+---
+
+### 三个创新点的故事（论文卖点）
+
+> 水下退化有两大物理现象：**散射**（致细节模糊）→ FEM 在频域处理；**吸收**（致蓝绿偏色）→ ColorLoss 在颜色域处理；而**双分支解耦流程**让网络结构本身就把这两种退化分开处理，再自适应融合。
 
 ---
 
@@ -78,9 +98,10 @@ L_color = mean( |r_pred−r_gt| + |g_pred−g_gt| + |b_pred−b_gt| )
 ### 分支结构
 
 ```
-master              → baseline（原 LANet）
-20260827-FEM        → + 频域模块 FEM（创新点1）
-20260827-ColorLoss  → + 颜色损失（创新点1 + 2）
+master                → baseline（原 LANet）
+20260827-FEM          → + 频域模块 FEM（创新点1）
+20260827-ColorLoss    → + 颜色损失（创新点1 + 2）
+20261013-DualBranch   → + 双分支解耦流程（创新点1 + 2 + 3）← 最新
 ```
 
 约定：每个创新点新建 `年月日-名称` 分支，从上一个分支分出；每个分支有自己的 `run.sh`。
@@ -96,21 +117,22 @@ master              → baseline（原 LANet）
 ## 四、进度状态
 
 ### ✅ 已完成
-- 两个创新点代码 + 冒烟测试（`test_freq.py`、`test_color.py`）
+- 三个创新点代码 + 冒烟测试（`test_freq.py`、`test_color.py`、`test_dual.py`）
 - `run.sh` 一键脚本（自动解压数据 → 下载 VGG16 → 验证代码 → 训练）
-- 文档：`设计亮点总览.md`、`改进说明.md`、`改进说明-颜色损失.md`
+- 文档：`设计亮点总览.md`、`改进说明.md`、`改进说明-颜色损失.md`、`改进说明-双分支.md`
 - git 历史重写、分支结构、数据集工作流
 - **FEM 修复已生效，训练视觉效果不错** ✅
+- **双分支模型 `test_dual.py` 本地测试 4 项全过** ✅
 
 ### ⏳ 未完成（核心缺口）
-- baseline / FEM / ColorLoss 的**完整训练 + PSNR/SSIM 指标**
-- 对比实验（baseline vs FEM vs FEM+ColorLoss）
-- 消融实验（FEM 单独 / ColorLoss 单独 / 结合）
-- 指标：PSNR / SSIM / UCIQE / UIQM
+- baseline / FEM / ColorLoss / **DualBranch** 的**完整训练 + PSNR/SSIM 指标**
+- **指标计算脚本（PSNR/SSIM/UCIQE/UIQM）—— 代码里还没有**
+- 对比实验（baseline vs FEM vs ColorLoss vs DualBranch）
+- 消融实验（FEM 单独 / ColorLoss 单独 / 双分支）
 - 下游任务（检测，加分项）
 - 写论文
 
-> **核心提醒**：论文能不能发，取决于 "FEM 和 ColorLoss 有没有带来实打实的 PSNR/SSIM 提升"。改动量对 Q4 足够，数字才是关键门槛。
+> **核心提醒**：论文能不能发，取决于"三个创新点有没有带来实打实的 PSNR/SSIM 提升"。数字才是关键门槛。
 
 ---
 
@@ -123,6 +145,7 @@ master              → baseline（原 LANet）
 5. **batch_size=2**：FEM 的 FFT 显存开销大，batch=4 会 OOM（24GB 卡）
 6. **FEM 零初始化**：新分支初始不放大信号，是深度学习"新模块零初始化"标准做法（ResNet 同款）
 7. **创新点大小 vs Q4**：改动小不可怕，数字差才可怕；有物理动机 + 分工明确 + 消融证据 = 审稿人认可
+8. **流程级 vs 模块级**：前两个创新点（FEM/ColorLoss）是模块级+损失级；第三个（双分支解耦）是**流程级**改动，解决"整体流程没改"的顾虑
 
 ---
 
