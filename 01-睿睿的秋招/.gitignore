@@ -1,0 +1,15 @@
+# LaTeX 中间产物（编译时自动生成，可随时删）
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+
+# 照片（含个人肖像，不要进仓库）
+tex-template/photo.jpg
+tex-template/photo.png
+
+# 网络请求抓包（含招聘网站的个人登录态）
+*.network-request
+*.network-response
+.iguopin_*

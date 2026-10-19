@@ -1,0 +1,198 @@
+% !TEX program = xelatex
+%==============================================================================
+%  中文简历模版（空白版）· 单栏 + 右上照片
+%
+%  编译：TeXstudio 按 F5　／　命令行 xelatex 模板-空白.tex（跑两遍）
+%       文件名带中文有时会碍事，可以先改名：cp 模板-空白.tex myresume.tex
+%
+%  用法：只改 "CONTENT 内容层" 标记以下的部分。
+%        排版层（字体/颜色/间距/宏）已调好，改内容不会破坏版式。
+%
+%  内容层可用的宏：
+%    \resumeheader{姓名}{联系方式}{照片文件}{求职意向}
+%    \ressection{章节名}
+%    \entry{机构或项目名}{时间}{副标题}     ← 副标题留空写 {}
+%    \begin{bullets} \item ... \end{bullets}
+%    \skillrow{类别}{内容}
+%    \tighten                              ← 内容超一页时在内容层开头调用
+%
+%  ⚠️ 写完务必查一遍编译日志有没有缺字：
+%      grep -i "missing character" 模板-空白.log
+%     出现 "Missing character" 说明某个字形没画出来——PDF 里显示空白，
+%     但复制文字却正常，极易漏掉。中文走中文字体没问题；希腊字母
+%     （μ δ α）必须写成数学模式 $\mu$ $\delta$ $\alpha$，否则拉丁字体里没有。
+%==============================================================================
+\documentclass[11pt,a4paper]{ctexart}
+
+%------------------------------------------------------------------------------
+% 0. 让 PDF 里的中文可被复制、被招聘系统（ATS）正确解析。【勿删】
+%------------------------------------------------------------------------------
+\XeTeXgenerateactualtext=1
+
+%------------------------------------------------------------------------------
+% 1. 字体：正文宋体，加粗自动切黑体
+%------------------------------------------------------------------------------
+\usepackage{fontspec}
+\setCJKmainfont{Songti SC}[BoldFont=Heiti SC]
+\setCJKsansfont{Heiti SC}
+\newCJKfontfamily\hei{Heiti SC}      % \hei  切黑体（章节标题用）
+\newCJKfontfamily\song{Songti SC}    % \song 切宋体
+\newCJKfontfamily\kai{Kaiti SC}      % \kai  切楷体
+\newCJKfontfamily\songb{Songti SC Bold}  % \songb 宋体加粗（条目主标题用）
+
+%------------------------------------------------------------------------------
+% 2. 页面与基础排版
+%------------------------------------------------------------------------------
+\usepackage[top=1.15cm,bottom=0.95cm,left=1.45cm,right=1.45cm]{geometry}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{etoolbox}
+\usepackage[hidelinks]{hyperref}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\linespread{1.0}
+\setlength{\parskip}{0pt}
+
+\definecolor{accent}{HTML}{1F4E79}   % 主题色（深蓝）
+\definecolor{rulegray}{HTML}{2B2B2B}
+
+%------------------------------------------------------------------------------
+% 3. 排版宏
+%------------------------------------------------------------------------------
+
+% 章节标题：\ressection{教育背景}
+%   上方留白大于下方，使「标题 + 横线」读作一个整体
+\newcommand{\ressection}[1]{%
+  \vspace{0.52em}%
+  \noindent{\hei\large\bfseries\color{accent}#1}\par
+  \vspace{-0.55em}%
+  \noindent{\color{accent}\rule{\linewidth}{1pt}}\par
+  \vspace{0.10em}%
+}
+
+% 条目头：\entry{机构或项目名}{时间}{副标题}
+%   整行统一宋体：主标题宋体加粗，副标题宋体常规且略小，时间右对齐
+%   不需要副标题就写 {}
+\newcommand{\entry}[3]{%
+  \vspace{0.14em}%
+  \noindent\begin{tabularx}{\linewidth}{@{}X@{}r@{}}
+    {\songb #1}\ifblank{#3}{}{\hspace{0.7em}{\small #3}} & {\small #2} \\
+  \end{tabularx}%
+}
+
+% 要点列表：topsep 与 itemsep 取同一值，保证「条目→首条」与「条→条」间距一致
+\newenvironment{bullets}{%
+  \begin{itemize}[leftmargin=1.0em,itemsep=0.10em,topsep=0.10em,parsep=0pt,%
+                  partopsep=0pt,label=\textbullet]%
+}{\end{itemize}}
+
+% 技能行：\skillrow{类别}{内容}
+\newcommand{\skillrow}[2]{%
+  \noindent\textbf{#1}：#2\par\vspace{0.04em}%
+}
+
+% 页眉：\resumeheader{姓名}{联系方式}{照片}{求职意向}　照片不存在会自动画占位框
+\newcommand{\resumeheader}[4]{%
+  \noindent
+  \begin{minipage}[c]{\dimexpr\linewidth-2.75cm\relax}
+    {\hei\fontsize{22}{26}\selectfont #1}\par
+    \ifblank{#4}{}{\vspace{0.28em}{\small\bfseries\color{accent}求职意向：#4}\par}%
+    \vspace{0.34em}
+    {\small #2}\par
+  \end{minipage}%
+  \hfill
+  \begin{minipage}[c]{2.5cm}
+    \centering
+    \IfFileExists{#3}%
+      {\includegraphics[width=2.2cm,height=2.9cm,keepaspectratio]{#3}}%
+      {\fbox{\parbox[c][2.9cm][c]{2.2cm}{\centering\scriptsize 照片\\[0.2em]放\\[0.2em]\texttt{\tiny #3}}}}%
+  \end{minipage}\par
+  \vspace{0.30em}%
+}
+
+% 压缩开关：内容溢出时在内容层开头加 \tighten
+\newcommand{\tighten}{%
+  \linespread{1.0}\selectfont
+  \setlist[itemize]{itemsep=0.0em,topsep=0.02em,parsep=0pt}%
+  \setlength{\parskip}{0pt}%
+}
+
+%==============================================================================
+%  CONTENT 内容层 —— 只改这以下的部分
+%==============================================================================
+% 内容超过一页时，去掉下面这行的注释
+% \tighten
+
+\begin{document}
+
+%------------------------------------------------------------------ 页眉
+\resumeheader{姓　名}%
+  {手机号~|~邮箱~|~政治面貌~|~性别~|~出生年月}%
+  {photo.jpg}%
+  {求职意向（岗位方向）}
+
+%------------------------------------------------------------------ 教育背景
+\ressection{教育背景}
+
+\entry{学校名称}{2024.09 -- 2027.06}{专业（硕士）~|~GPA X.XX}
+\begin{bullets}
+  \item \textbf{主修课程}：课程一（90）、课程二（93）、课程三（96）
+\end{bullets}
+
+\entry{学校名称}{2018.09 -- 2022.07}{专业（本科）~|~GPA X.XX（专业前 10\%）}
+\begin{bullets}
+  \item \textbf{主修课程}：课程一（95）、课程二（91）、课程三（96）
+\end{bullets}
+
+%------------------------------------------------------------------ 科研经历
+% 以「动作 + 方法 + 量化结果」写，不要写"参与了…"
+\ressection{科研经历}
+
+\entry{课题 / 项目名称}{2025.12 -- 至今}{所属机构}
+\begin{bullets}
+  \item 做了什么：采用 XX 方法 / 设计了 XX，具体到你的动作和技术细节
+  \item 结果：使 XX 指标提升 N 倍 / 达到 N\%，用数字说话
+  \item 成果：论文在投 / 在写 / 已发表
+\end{bullets}
+
+%------------------------------------------------------------------ 项目经历
+\ressection{项目经历}
+
+\entry{项目名称}{2021.02 -- 2021.07}{担任角色~|~所属单位}
+\begin{bullets}
+  \item 背景与方法：解决了什么问题，用了什么工艺 / 工具
+  \item 你的独立产出：写清哪些是你一个人完成的
+  \item 结果与获奖：名次、指标、是否被采用
+\end{bullets}
+
+%------------------------------------------------------------------ 学生工作
+% 不投国企 / 没有相关经历就整段删掉
+\ressection{学生工作}
+
+\skillrow{职务名称（起止时间）}{单位。做了什么，尽量写可迁移的能力：组织、文档、档案、协调}
+
+%------------------------------------------------------------------ 专业技能
+\ressection{专业技能}
+
+\skillrow{专业软件}{软件一、软件二、软件三}
+\skillrow{编程能力}{语言（熟练度、用在什么地方）}
+\skillrow{语言证书}{英语 CET-X（XXX 分）；普通话等级}
+\skillrow{其他}{与目标岗位相关的技能}
+
+%------------------------------------------------------------------ 荣誉与成果
+\ressection{荣誉与成果}
+
+\skillrow{学术成果}{论文 N 篇、专利 N 项}
+\skillrow{竞赛与荣誉}{奖项名称 + 级别 + 年份}
+
+%------------------------------------------------------------------ 自我评价
+% 可选。写"能干什么"，不写"性格开朗"。不需要就整段删掉
+% \ressection{自我评价}
+%
+% 两到三句话，收在最有说服力的事实上。
+
+\end{document}
