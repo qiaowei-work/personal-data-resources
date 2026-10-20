@@ -1,0 +1,2 @@
+# 本 skill 使用 Python 标准库 + 系统 curl，不需要第三方 Python 包。
+# macOS/Linux 通常自带 curl；Windows 需自行确认 curl 可用。

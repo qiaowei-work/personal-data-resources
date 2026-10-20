@@ -1,0 +1,149 @@
+{
+  "_说明": "复制到 ~/.qiuzhao-radar/config.json 后按需修改；CLI 的 --config 可指定其他路径。",
+  "data_dir": "~/.qiuzhao-radar",
+  "grad_year": 2027,
+  "target_cities": [
+    "成都",
+    "南京"
+  ],
+  "majors": [
+    "化学工程与技术",
+    "化学工程与工艺",
+    "化学工程",
+    "化学",
+    "应用化学",
+    "化工",
+    "应用化工技术",
+    "化工技术",
+    "精细化工技术",
+    "材料与化工",
+    "材料科学与工程",
+    "材料化学",
+    "材料物理与化学",
+    "高分子材料",
+    "高分子材料与工程",
+    "复合材料与工程",
+    "新能源材料",
+    "环境科学与工程",
+    "安全科学与工程",
+    "能源动力",
+    "能源化学工程",
+    "资源循环科学与工程",
+    "冶金工程",
+    "不限专业",
+    "专业不限"
+  ],
+  "keywords": [
+    "化工",
+    "化学",
+    "材料",
+    "工艺",
+    "新能源",
+    "质量",
+    "EHS",
+    "管培生",
+    "2027届",
+    "校园招聘"
+  ],
+  "topic_keywords": [
+    "化工",
+    "化学",
+    "材料",
+    "工艺",
+    "研发",
+    "质量",
+    "EHS",
+    "安全",
+    "环保",
+    "环境",
+    "能源",
+    "新能源",
+    "冶金",
+    "分析",
+    "检测",
+    "管培",
+    "高分子",
+    "精细化工",
+    "石油",
+    "天然气",
+    "电池",
+    "生物",
+    "制药",
+    "生产",
+    "制造",
+    "设备",
+    "电气",
+    "仪表",
+    "自动化",
+    "机械"
+  ],
+  "strong_topic_keywords": [
+    "化工",
+    "化学",
+    "材料",
+    "高分子",
+    "精细化工",
+    "冶金",
+    "电池",
+    "新能源",
+    "石油",
+    "天然气",
+    "生物",
+    "制药",
+    "药物",
+    "催化",
+    "电化学",
+    "环境工程",
+    "安全工程",
+    "能源化学",
+    "分析化学"
+  ],
+  "include_internships": false,
+  "include_social": false,
+  "include_research_institutes": false,
+  "scbdc": {
+    "enabled": true,
+    "days": 30,
+    "max_pages": 3,
+    "event_days": 60,
+    "event_pages": 1,
+    "event_types": [
+      "campus",
+      "jobfair",
+      "teachin"
+    ]
+  },
+  "sicau": {
+    "enabled": true,
+    "max_pages": 1,
+    "page_size": 50
+  },
+  "ncss": {
+    "enabled": true,
+    "max_pages": 5,
+    "page_size": 20,
+    "properties": [
+      "国有企业",
+      "机关/事业单位/非营利机构",
+      "民营企业",
+      "外商投资企业"
+    ]
+  },
+  "iguopin": {
+    "enabled": true,
+    "max_pages": 20,
+    "campus_only": true
+  },
+  "ats": {
+    "enabled": true,
+    "max_pages": 3
+  },
+  "feishu": {
+    "enabled": false,
+    "application_base_token": "",
+    "application_table_id": "",
+    "application_table_name": "投递记录",
+    "report_doc_token": "",
+    "report_doc_url": ""
+  }
+}
